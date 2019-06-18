@@ -4,6 +4,8 @@ import bootstrap.TransactionBootstrap;
 import models.Transaction;
 
 import java.util.*;
+import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.function.UnaryOperator;
 import java.util.stream.Collectors;
@@ -58,7 +60,7 @@ public class CollectionFactories {
         // have to import static java.util.Map.entry;
     }
 
-    public static void removeIfExample() {
+    public static void listRemoveIfExample() {
 
         // this code could throw ConcurrentModificationException
         List<Transaction> transactions = TransactionBootstrap.init();
@@ -96,8 +98,48 @@ public class CollectionFactories {
         list1.replaceAll(uppercaseFirstLetter);
     }
 
+    public static void hashmapExample() {
+
+        Map<String, String> map1 = new HashMap<>();
+        map1.put("Name 2", "Num 2");
+        map1.put("Name 1", "Num 1");
+
+        // iterate old way
+        for (Map.Entry<String, String> entry : map1.entrySet()) {
+            String key = entry.getKey();
+            String value = entry.getValue();
+            System.out.println("key: " + key + "; value: " + value);
+        }
+
+        // iterate by java 8
+        map1.forEach(showKeyValue);
+
+        // sort by keys, values
+        // for performance, key should be String or Number
+        // that we can use the entries as sorted tree with O(log(n)) retrieval
+        // if not, default is LinkedList with O(n) retrieval
+        map1.entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .forEachOrdered(System.out::println);
+
+        // getOrDefault
+        System.out.println(map1.getOrDefault("Num 3", "Test"));
+
+        // map has 3 compute functions: computeIfAbsent, computeIfPresent, compute
+        Map<String, List<String>> todoList = new HashMap<>();
+        todoList.computeIfAbsent("taking_notes", generateList).add("coding function 1");
+
+        map1.remove("Name 1", "Num 1");
+    }
+
     private static Predicate<Transaction> valueIs1000 = transaction -> transaction.getValue() == 1000;
 
     private static UnaryOperator<String> uppercaseFirstLetter =
             item -> Character.toUpperCase(item.charAt(0)) + item.substring(1);
+
+    private static BiConsumer<String, String> showKeyValue =
+            (key, value) -> System.out.println("key: " + key + "; value: " + value);
+
+    private static Function<String, List<String>> generateList = value -> new ArrayList<>();
 }
