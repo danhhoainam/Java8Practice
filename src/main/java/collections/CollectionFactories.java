@@ -4,6 +4,7 @@ import bootstrap.TransactionBootstrap;
 import models.Transaction;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Predicate;
@@ -13,7 +14,7 @@ import java.util.stream.Stream;
 
 public class CollectionFactories {
 
-    public static void listExample() {
+    public static void initListExample() {
 
         // old style
         List<String> list1 = new ArrayList<>();
@@ -30,7 +31,7 @@ public class CollectionFactories {
         // unable to set or add --> fully immutable
     }
 
-    public static void setExample() {
+    public static void initSetExample() {
 
         // set from list
         Set<String> set1 = new HashSet<>(Arrays.asList("45", "54")); // mutable
@@ -42,7 +43,7 @@ public class CollectionFactories {
         // Set<String> set3 = Set.of("123", "456");
     }
 
-    public static void mapExample() {
+    public static void initMapExample() {
 
         // old style
         Map<String, String> map1 = new HashMap<>();
@@ -82,7 +83,7 @@ public class CollectionFactories {
         transactions.removeIf(valueIs1000);
     }
 
-    public static void replaceAllExample() {
+    public static void listReplaceAllExample() {
 
         List<String> list1 = new ArrayList<>();
         list1.add("1");
@@ -103,6 +104,12 @@ public class CollectionFactories {
         Map<String, String> map1 = new HashMap<>();
         map1.put("Name 2", "Num 2");
         map1.put("Name 1", "Num 1");
+        map1.put("Name 5", "Num 5");
+        map1.put("Name 4", "Num 4");
+
+        Map<String, String> map2 = new HashMap<>();
+        map2.put("Name 3", "Num 3");
+        map2.put("Name 6", "Num 6");
 
         // iterate old way
         for (Map.Entry<String, String> entry : map1.entrySet()) {
@@ -130,7 +137,31 @@ public class CollectionFactories {
         Map<String, List<String>> todoList = new HashMap<>();
         todoList.computeIfAbsent("taking_notes", generateList).add("coding function 1");
 
+        // remove
         map1.remove("Name 1", "Num 1");
+
+        // replace All
+        map1.replaceAll((key, value) -> value.toUpperCase());
+
+        // how to merge 2 maps
+        Map<String, String> mergedMap = new HashMap<>(map1);
+        map2.forEach((key, value) -> mergedMap.merge(key, value, (left, right) -> left + " & " + right));
+    }
+
+    public static void concurrentHashmapExample() {
+
+        ConcurrentHashMap<String, Long> map = new ConcurrentHashMap<>();
+
+        // find max values
+        long parallelismThreshold = 1;
+        Optional<Long> maxValue =
+                Optional.ofNullable(map.reduceValues(parallelismThreshold, Long::max));
+
+        // count
+        long numberOfElements = map.mappingCount();
+
+        // search
+        map.search(parallelismThreshold, (key, value) -> "1".equals(key) && value != null);
     }
 
     private static Predicate<Transaction> valueIs1000 = transaction -> transaction.getValue() == 1000;
