@@ -162,6 +162,10 @@ public class CollectionFactories {
 
         // search
         map.search(parallelismThreshold, (key, value) -> "1".equals(key) && value != null);
+
+        // KeySetView
+        ConcurrentHashMap.KeySetView<String, Long> keySetView = map.keySet();
+        map.newKeySet();
     }
 
     private static Predicate<Transaction> valueIs1000 = transaction -> transaction.getValue() == 1000;
