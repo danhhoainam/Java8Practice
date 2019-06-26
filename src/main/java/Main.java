@@ -13,6 +13,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static predicates.StudentPredicates.*;
 
@@ -22,13 +24,15 @@ public class Main {
 
     final static String SENTENCE =
             " Nel   mezzo del cammin  di nostra  vita " +
-            "mi  ritrovai in una  selva oscura" +
-            " ché la  dritta via era   smarrita " +
-            "  ché la  dritta via era   smarrita";
+                    "mi  ritrovai in una  selva oscura" +
+                    " ché la  dritta via era   smarrita " +
+                    "  ché la  dritta via era   smarrita";
 
     public static void main(String[] args) {
 
-        // testSumBenchmark();
+        neverMutateVarWithStream();
+
+        testSumBenchmark();
 
         System.out.println("count words Iteratively: " + CountWords.countWordsIteratively(SENTENCE));
         System.out.println("count words with counter: " + CountWords.countWordsWithWordCounter(SENTENCE));
@@ -36,6 +40,25 @@ public class Main {
                 + CountWords.countWordsParallelWithWordCounter(SENTENCE));
         System.out.println("count words parallel with spliterator counter: "
                 + CountWords.countWordsWithWordCounterSpliterator(SENTENCE));
+    }
+
+    public static void neverMutateVarWithStream() {
+
+        List<String> test1 = new ArrayList<>();
+        IntStream.rangeClosed(0, 50)
+                .boxed()
+                .parallel()
+                .forEach(item -> test1.add(String.valueOf(item)));
+        List<String> test2 = IntStream.rangeClosed(0, 50)
+                .boxed()
+                .parallel()
+                .map(String::valueOf)
+                .collect(Collectors.toList());
+
+        System.out.println(test1);
+        System.out.println(test1.size());
+        System.out.println(test2);
+        System.out.println(test2.size());
     }
 
     public static void testPrimesBenchmark() {
@@ -70,7 +93,7 @@ public class Main {
         long start = System.nanoTime();
         InfiniteStreams.sequentialSum(10_000_000L);
         long end = System.nanoTime();
-        System.out.println("Duration sequential sum: " + ((end - start)/1_000_000) + " ms");
+        System.out.println("Duration sequential sum: " + ((end - start) / 1_000_000) + " ms");
 
         // parallel sum is much more slower than the sequential sum
         // why?
@@ -78,7 +101,7 @@ public class Main {
         long start1 = System.nanoTime();
         InfiniteStreams.parallelSum(10_000_000L);
         long end1 = System.nanoTime();
-        System.out.println("Duration parallel sum: " + ((end1 - start1)/1_000_000) + " ms");
+        System.out.println("Duration parallel sum: " + ((end1 - start1) / 1_000_000) + " ms");
     }
 
     public static void testExceptionLogging() {
@@ -104,6 +127,7 @@ public class Main {
 
     /**
      * should be improved with Pattern.compile() for better performance
+     *
      * @param value
      * @return
      */
@@ -113,7 +137,7 @@ public class Main {
         String newValue = Normalizer.normalize(nonNullValue, Normalizer.Form.NFD);
 
         return newValue
-                .replaceAll( "[\\p{M}]", "" )
+                .replaceAll("[\\p{M}]", "")
                 .replaceAll("[^a-zA-Z0-9 ]", "")
                 .trim()
                 .replaceAll("\\s+", " ")
@@ -134,8 +158,8 @@ public class Main {
 
         Student student1 = new Student(1L, "Student 1", 20, Gender.MALE, 25, 99);
         Student student2 = new Student(2L, "Student 2", 18, Gender.FEMALE, 40, 99);
-        Student student3 = new Student(3L,"Student 3", 25, Gender.MALE, 1, 99);
-        Student student4 = new Student(4L,"Student 4 SH", 30, Gender.FEMALE, 14, 99);
+        Student student3 = new Student(3L, "Student 3", 25, Gender.MALE, 1, 99);
+        Student student4 = new Student(4L, "Student 4 SH", 30, Gender.FEMALE, 14, 99);
 
         System.out.println("Student 2 is Female? " + isFemaleStudent.test(student2));
 

@@ -12,7 +12,8 @@ import static functions.DishFunctions.groupingByCaloricLevelFunction;
 import static java.util.Comparator.comparing;
 import static java.util.Comparator.comparingInt;
 import static java.util.stream.Collectors.*;
-import static predicates.DishPredicates.*;
+import static predicates.DishPredicates.hasCaloriesLessThan400;
+import static predicates.DishPredicates.isVegeterian;
 
 /**
  * @author: Nichol
